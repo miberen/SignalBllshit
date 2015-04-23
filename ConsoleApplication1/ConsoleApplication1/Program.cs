@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -51,23 +52,31 @@ namespace ConsoleApplication1
 
             for (int i = 0; i < list2.Count-1; i++)
             {
-                done.Add(Convert.ToDouble(list1[i])/1000 + "\t" + list2[i]);
+                done.Add(Convert.ToDouble(list1[i])/1000 + "\t" + list2[i]);              
             }
 
             return done;
         }
 
-        public static List<string> JoinTimNumIBI(List<string> list1, List<string> list2)
+        public static List<string> JoinTimNumIBI(List<string> list1, List<string> list2, List<int> index)
         {
             List<string> done = new List<string>();
-            int[] intermediateNums = new int[list1.Count];
-
+            int currentValue = Convert.ToInt32(list2[0]);
+            int count = 0;
 
             for (int i = 0; i < list1.Count - 1; i++)
             {
-                done.Add(Convert.ToDouble(list1[i]) / 1000 + "\t" + list2[i]);
+                if (i < index[count])
+                {
+                    done.Add(Convert.ToDouble(list1[i]) / 1000 + "\t" + currentValue);
+                }
+                else if (count < list2.Count-1)
+                {
+                    count++;
+                    currentValue = Convert.ToInt32(list2[count]);                    
+                }
             }
-
+            
             return done;
         }
         static void Main(string[] args)
@@ -124,8 +133,8 @@ namespace ConsoleApplication1
             }
             EDAnew = FilterSignal(blockSize, EDAnumbers);
 
-            File.WriteAllLines(@"C:\Users\AnonUser\Documents\Processing\Reader\data\dataIBI.txt", _IBI);
-            File.WriteAllLines(@"C:\Users\AnonUser\Documents\Processing\Reader\data\dataIBITimNum.txt", _IBI);
+            File.WriteAllLines(@"C:\Users\AnonUser\Documents\SignalBllshit\data\dataIBI.txt", _IBI);
+            File.WriteAllLines(@"C:\Users\AnonUser\Documents\SignalBllshit\data\dataIBITimNum.txt", JoinTimNumIBI(IBItimings.ConvertAll(delegate(int i) { return i.ToString(); }), _IBI, IBIIndex));
             File.WriteAllLines(@"C:\Users\AnonUser\Documents\SignalBllshit\data\dataEDAtimings.txt", EDATimings.Select(Convert.ToString));
             File.WriteAllLines(@"C:\Users\AnonUser\Documents\SignalBllshit\data\dataEDAfiltered.txt", EDAnew);
             File.WriteAllLines(@"C:\Users\AnonUser\Documents\SignalBllshit\data\dataEDATimNum.txt", JoinTimNum(new List<string>(EDATimings.Select(Convert.ToString)), EDAnew));
